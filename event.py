@@ -1,6 +1,7 @@
-#abstract Events class
+#! /usr/bin/env python3
 
 class AbsEvent:
+    # abstract Events class
     pass
 
 class MarketEvent(AbsEvent):

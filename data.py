@@ -1,11 +1,11 @@
 #! /usr/bin/env python3
-# standard library
+
 import os, os.path
 from datetime import datetime
 from abc import ABCMeta, abstractmethod
-# 3rd party
+
 import pandas as pd
-# local library
+
 from event import MarketEvent
 
 class DataHandler:
