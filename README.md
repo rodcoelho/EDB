@@ -1,4 +1,4 @@
 # EDB
-Event Driven Backtester
+This EDB, or event-driven backtesting environment, is still a WIP.
 
-Input rules: Files with data should be named like so: `AAPL.csv`, `TSLA.csv`, etc...
+The intention is to be able to test investment theories on historical AND live data.
