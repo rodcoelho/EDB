@@ -1,4 +1,3 @@
-#EDB
 Event Driven Backtester
 
 This EDB is still a WIP.
