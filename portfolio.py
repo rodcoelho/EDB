@@ -10,6 +10,7 @@ import pandas as pd
 
 import Queue
 from event import FillEvent, OrderEvent
+from performance import create_sharpe_ratio, create_drawdowns
 
 class Portfolio:
     __metaclass__ = ABCMeta
@@ -175,3 +176,19 @@ class NaivePortfolio(Portfolio):
         curve['returns'] = curve['total'].pct_change()
         curve['equity_curve'] = (1.0 + curve['returns']).cumprod()
         self.equity_curve = curve
+
+    def output_summary_stats(self):
+        # creates a list of summary statistics for the portfolio (ie. sharpie and markdown info)
+        total_return = self.equity_curve['equity_curve'][-1]
+        returns = self.equity_curve['returns']
+        pnl = self.equity_curve['equity_curve']
+
+        sharpe_ratio = create_sharpe_ratio(returns)
+        max_dd, dd_duration = create_drawdowns(pnl)
+
+        # TODO remove the "%0.2f%%" stuff
+        stats = [("Total Return", "%0.2f%%" % ((total_return - 1.0) * 100.0)),
+                 ("Sharpe Ratio", "%0.2f" % sharpe_ratio),
+                 ("Max Drawdown", "%0.2f%%" % (max_dd * 100.0)),
+                 ("Drawdown Duration", "%d" % dd_duration)]
+        return stats
