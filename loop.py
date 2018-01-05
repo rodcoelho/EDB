@@ -1,5 +1,6 @@
 import queue as Queue
 import time
+TIME = 10*60 # hourly
 
 from event import MarketEvent, SignalEvent, OrderEvent, FillEvent
 
@@ -38,3 +39,5 @@ while True:
                 # do something
             # TODO if FillEvent
                 # do something
+
+        time.sleep(TIME)
