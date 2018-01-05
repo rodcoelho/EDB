@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 import pandas as pd
 
-import Queue
+import queue as Queue
 from event import FillEvent, OrderEvent
 from performance import create_sharpe_ratio, create_drawdowns
 

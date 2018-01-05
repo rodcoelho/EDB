@@ -1,7 +1,7 @@
 import datetime
 from abc import ABCMeta, abstractmethod
 
-import Queue
+import queue as Queue
 from event import FillEvent, OrderEvent
 
 class ExecutionHandler:
