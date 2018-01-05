@@ -93,4 +93,4 @@ class HistoricalCSV_DataHander(DataHandler):
             else:
                 if data is None:
                     self.latest_symbol_data[symb].append(data)
-        self.event.put(MarketEvent)
+        self.events_queue.put(MarketEvent)
