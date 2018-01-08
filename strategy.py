@@ -22,13 +22,13 @@ class BuyAndHoldStrategy(Strategy):
     # simplest of strategies - it goes LONG on all symbols as soon as data comes in and never sells
     # used as a benchmark to test success of other strategies
 
-    def __init__(self, data, event):
+    def __init__(self, bars, events):
         # initializes buy and hold forever strategy
         # data - the DataHandler object from data.py
         # event - the Event Queue object from event.py
-        self.data = data
-        self.symbol_list = self.data.symbol_list
-        self.event = event
+        self.bars = bars
+        self.symbol_list = self.bars.symbol_list
+        self.events = events
 
         # Once buy and hold signal is given, these are set to True
         self.bought = self._calculate_initial_bought()
@@ -43,12 +43,12 @@ class BuyAndHoldStrategy(Strategy):
         return bought
 
     def calculate_signals(self):
-        if self.event.type == 'MARKET':
+        if self.events.type == 'MARKET':
             for s in self.symbol_list:
-                bars = self.data.get_latest_bars(s, N=1)
+                bars = self.bars.get_latest_bars(s, N=1)
                 if bars is not None and bars != []:
                     if self.bought[s] == False:
                         # (Symbol, Datetime, Type = LONG, SHORT or EXIT)
                         signal = SignalEvent(bars[0][0], bars[0][1], 'LONG')
-                        self.event.put(signal)
+                        self.events.put(signal)
                         self.bought[s] = True

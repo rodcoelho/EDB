@@ -19,9 +19,9 @@ class SimulatedExecutionHandler(ExecutionHandler):
     # converts all order objects into their equivalent fill objects
     # this model does not take into account 1) latency 2) slippage/fill-ratio issues
 
-    def __init__(self, event):
+    def __init__(self, events):
         # initializes the handler
-        self.event = event
+        self.events = events
 
     def execute_order(self, event):
         # converts Order objects into Fill objects
@@ -29,5 +29,4 @@ class SimulatedExecutionHandler(ExecutionHandler):
             fill_event = FillEvent(datetime.datetime.utcnow(), event.symbol,
                                    'ARCA',  # ARCA is the exchange we get the data from
                                    event.quantity, event.direction, None)
-            self.event.put(fill_event)
-
+            self.events.put(fill_event)

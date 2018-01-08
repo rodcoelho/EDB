@@ -30,10 +30,10 @@ class NaivePortfolio(Portfolio):
     # and will carry out trading orders in a "dumb" manner
     # It will simply send orders directly to the brokerage with a predetermined fixed quantity size
     # irrespective of cash held.
-    def __init__(self, data, event, start_date, initial_capital = 100000.0):
-        self.data = data                             # DataHandler object w/current market data
-        self.event = event                           # Event Queue object
-        self.symbol_list = self.data.symbol_list
+    def __init__(self, bars, events, start_date, initial_capital = 100000.0):
+        self.bars = bars                             # DataHandler object w/current market data
+        self.events = events                           # Event Queue object
+        self.symbol_list = self.bars.symbol_list
         self.start_date = start_date                 # Start date of portfolio
         self.initial_capital = initial_capital       # Starting capital
 
@@ -69,14 +69,14 @@ class NaivePortfolio(Portfolio):
     def update_timeindex(self,event):
         # adds a new record to the positions matrix for the current market data at current price
         # employs MarketEvent from events queue
-        data = {}
+        bars = {}
         for sym in self.symbol_list:
-            data[sym] = self.data.get_latest_data(sym, N=1)
+            bars[sym] = self.bars.get_latest_data(sym, N=1)
 
         # update positions
         # dp = dictionary of positions
         dp = dict( (k,v) for k, v in [(s, 0) for s in self.symbol_list] )
-        dp['datetime'] = data[self.symbol_list[0]][0][1]
+        dp['datetime'] = bars[self.symbol_list[0]][0][1]
 
         for s in self.symbol_list:
             dp[s] = self.current_positions[s]
@@ -87,14 +87,14 @@ class NaivePortfolio(Portfolio):
         # update holdings
         # dh = dictionary of holdings
         dh = dict( (k,v) for k, v in [(s, 0) for s in self.symbol_list] )
-        dh['datetime'] = data[self.symbol_list[0]][0][1]
+        dh['datetime'] = bars[self.symbol_list[0]][0][1]
         dh['cash'] = self.current_holdings['cash']
         dh['commission'] = self.current_holdings['commission']
         dh['total'] = self.current_holdings['cash']
 
         for s in self.symbol_list:
             # approximation to real market value
-            market_value = self.current_positions[s] * data[s][0][5]
+            market_value = self.current_positions[s] * bars[s][0][5]
             dh[s] = market_value
             dh['total'] += market_value
 
@@ -124,7 +124,7 @@ class NaivePortfolio(Portfolio):
             fill_dir = -1
 
         # then updates holdings list with new quantities
-        fill_cost = self.data.get_latest_data(fill.symbol)[0][5]
+        fill_cost = self.bars.get_latest_data(fill.symbol)[0][5]
         cost = fill_dir * fill_cost * fill.quantity
         self.current_holdings[fill.symbol] += cost
         self.current_holdings['commission'] += fill.commission
@@ -166,7 +166,7 @@ class NaivePortfolio(Portfolio):
         # responds to SignalEvent to generate new orders based on portfolio 'logic'
         if event.type == 'SIGNAL':
             order_event = self.generate_naive_order(event)
-            self.event.put(order_event)
+            self.events.put(order_event)
 
     def create_equity_curve_dataframe(self):
         # simply creates a returns stream, useful for performance calculation
@@ -185,11 +185,8 @@ class NaivePortfolio(Portfolio):
 
         sharpe_ratio = create_sharpe_ratio(returns)
         max_dd, dd_duration = create_drawdowns(pnl)
-
-        # TODO remove the "%0.2f%%" stuff
-        stats = [("Total Return", "%0.2f%%" % ((total_return - 1.0) * 100.0)),
-                 ("Sharpe Ratio", "%0.2f" % sharpe_ratio),
-                 ("Max Drawdown", "%0.2f%%" % (max_dd * 100.0)),
-                 ("Drawdown Duration", "%d" % dd_duration)]
+        stats = [("Total Return", "{: .2f}".format(((total_return - 1.0) * 100.0)),
+                 ("Sharpe Ratio", "{: .2f}".format(sharpe_ratio),
+                 ("Max Drawdown", "{: .2f}".format(max_dd * 100.0)),
+                 ("Drawdown Duration", "{}".format(dd_duration))]
         return stats
-
