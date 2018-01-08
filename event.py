@@ -1,15 +1,15 @@
 #! /usr/bin/env python3
 
-class AbsEvent:
+class Event:
     # abstract Events class
     pass
 
-class MarketEvent(AbsEvent):
+class MarketEvent(Event):
     # handles new market updates
     def __init__(self):
         self.type = 'MARKET'
 
-class SignalEvent(AbsEvent):
+class SignalEvent(Event):
     # handles sending events from Strategy to Portfolio
     def __init__(self, symbol, datetime, signal_type):
         # symbol: TSLA
@@ -20,7 +20,7 @@ class SignalEvent(AbsEvent):
         self.datetime = datetime
         self.signal_type = signal_type
 
-class OrderEvent(AbsEvent):
+class OrderEvent(Event):
     # handles sending Order events to the execution handler
     def __init__(self, symbol, order_type, quantity, direction):
         # symbol: TSLA
@@ -39,7 +39,7 @@ class OrderEvent(AbsEvent):
             self.quantity,
             self.direction))
 
-class FillEvent(AbsEvent):
+class FillEvent(Event):
     # returns info from the brokerage - price and cost of buying shares
     def __init__(self, timeindex, symbol, exchange, quantity, direction, fill_cost, commission=None):
         self.type = 'FILL'

@@ -192,3 +192,4 @@ class NaivePortfolio(Portfolio):
                  ("Max Drawdown", "%0.2f%%" % (max_dd * 100.0)),
                  ("Drawdown Duration", "%d" % dd_duration)]
         return stats
+
