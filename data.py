@@ -7,6 +7,7 @@ from abc import ABCMeta, abstractmethod
 import pandas as pd
 
 from event import MarketEvent
+import queue as Queue
 
 class DataHandler:
     # __metaclass__ property to let Python know that this is an ABC (Abstract Base Class)
@@ -14,11 +15,11 @@ class DataHandler:
 
     # @abstractmethod decorator to let Python know that the method will be overridden in subclasses
     @abstractmethod
-    def get_latest_data(self,symbol, N=1):
+    def get_latest_bars(self,symbol, N=1):
         raise NotImplementedError
 
     @abstractmethod
-    def update_data(self):
+    def update_bars(self):
         raise NotImplementedError
 
 class HistoricalCSV_DataHander(DataHandler):
@@ -43,7 +44,7 @@ class HistoricalCSV_DataHander(DataHandler):
 
         # combined_index is the total/continuous index for all the stock symbols
         # (ex: if we first backtest data from TSLA and then backtest AAPL data, the index will continue)
-        combined_index = None
+        comb_index = None
         for s in self.symbol_list:
             # csv file should have NO header details (i.e. delete the row with the 'datetime', 'open', etc details)
             self.symbol_data[s] = pd.read_csv(
@@ -53,24 +54,24 @@ class HistoricalCSV_DataHander(DataHandler):
             )
 
             # combine the index to 'pad' forward values
-            if combined_index is None:
-                combined_index = self.symbol_data[s].index
+            if comb_index is None:
+                comb_index = self.symbol_data[s].index
             else:
-                combined_index.union(self.symbol_data[s].index)
+                comb_index.union(self.symbol_data[s].index)
 
             # set latest symbol_data to None
             self.latest_symbol_data[s] = []
 
         # reindex the DataFrames
         for s in self.symbol_list:
-            self.symbol_data[s] = self.symbol_data[s].reindex(index = combined_index, method = 'pad').interrows()
+            self.symbol_data[s] = self.symbol_data[s].reindex(index=comb_index, method = 'pad').iterrows()
 
 
     def _get_new_bar(self, symbol):
         # returns tuple of the latest data from the 'data feed'
         # (symbol, datetime, open, low, high, close, volume)
         for b in self.symbol_data[symbol]:
-            yield tuple([symbol, datetime.strptime(b[0], "%Y-%m-%d %H:%M:%S"),
+            yield tuple([symbol, datetime.strptime(b[0], "%Y-%m-%d"),
                          b[1][0], b[1][1], b[1][2], b[1][3], b[1][4]])
 
     def get_latest_bars(self,symbol, N=1):
@@ -78,7 +79,7 @@ class HistoricalCSV_DataHander(DataHandler):
         # else: return N-k
         try:
             bars_list = self.latest_symbol_data[symbol]
-        except:
+        except KeyError:
             print("Symbol provided DNE in historical data set")
         else:
             return bars_list[-N:]
@@ -93,4 +94,4 @@ class HistoricalCSV_DataHander(DataHandler):
             else:
                 if bar is None:
                     self.latest_symbol_data[s].append(bar)
-        self.events.put(MarketEvent)
+        self.events.put(MarketEvent())

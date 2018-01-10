@@ -52,3 +52,4 @@ class BuyAndHoldStrategy(Strategy):
                         signal = SignalEvent(bars[0][0], bars[0][1], 'LONG')
                         self.events.put(signal)
                         self.bought[s] = True
+
