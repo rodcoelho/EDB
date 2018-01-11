@@ -7,7 +7,7 @@ from abc import ABCMeta, abstractmethod
 import pandas as pd
 
 from event import MarketEvent
-import queue as Queue
+from q import Que
 
 class DataHandler:
     # __metaclass__ property to let Python know that this is an ABC (Abstract Base Class)
@@ -94,4 +94,4 @@ class HistoricalCSV_DataHander(DataHandler):
             else:
                 if bar is None:
                     self.latest_symbol_data[s].append(bar)
-        self.events.put(MarketEvent())
+        self.events.qput(MarketEvent)

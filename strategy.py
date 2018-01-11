@@ -44,6 +44,7 @@ class BuyAndHoldStrategy(Strategy):
 
     def calculate_signals(self):
         if self.events.type == 'MARKET':
+            print("MARKET event transforms into SIGNAL EVENT")
             for s in self.symbol_list:
                 bars = self.bars.get_latest_bars(s, N=1)
                 if bars is not None and bars != []:
