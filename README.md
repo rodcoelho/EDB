@@ -1,4 +1,4 @@
-##Event Driven Backtester 
+## Event Driven Backtester 
 
 The EDB consists of two loops. The outer loop, handles incoming data and gives them an event type.
 The inner event-loop continually checks for new events and then performs actions based on events types
