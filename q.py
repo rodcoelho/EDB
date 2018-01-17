@@ -2,6 +2,12 @@ class Que:
     def __init__(self):
         self.qlist = []
 
+    def printlist(self):
+        temp = []
+        for elements in self.qlist:
+            temp.append(elements)
+        print(temp)
+
     def isEmpty(self):
         return self.qlist == []
 

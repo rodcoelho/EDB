@@ -8,7 +8,6 @@ import pandas as pd
 from abc import ABCMeta, abstractmethod
 
 from event import SignalEvent, MarketEvent
-import queue as Queue
 
 class Strategy:
     # abstract base class
@@ -44,13 +43,12 @@ class BuyAndHoldStrategy(Strategy):
 
     def calculate_signals(self):
         if self.events.type == 'MARKET':
-            print("MARKET event transforms into SIGNAL EVENT")
             for s in self.symbol_list:
                 bars = self.bars.get_latest_bars(s, N=1)
                 if bars is not None and bars != []:
                     if self.bought[s] == False:
                         # (Symbol, Datetime, Type = LONG, SHORT or EXIT)
                         signal = SignalEvent(bars[0][0], bars[0][1], 'LONG')
-                        self.events.put(signal)
+                        self.events.qput(signal)
                         self.bought[s] = True
 

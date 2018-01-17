@@ -136,3 +136,4 @@ class IBExecutionHandler(ExecutionHandler):
 
             # updates orderID for session
             self.order_id+=1
+

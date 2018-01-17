@@ -71,12 +71,15 @@ class NaivePortfolio(Portfolio):
         # employs MarketEvent from events queue
         bars = {}
         for sym in self.symbol_list:
-            bars[sym] = self.bars.get_latest_data(sym, N=1)
+            bars[sym] = self.bars.get_latest_bars(sym, N=1)
 
         # update positions
         # dp = dictionary of positions
-        dp = dict( (k,v) for k, v in [(s, 0) for s in self.symbol_list] )
-        dp['datetime'] = bars[self.symbol_list[0]][0][1]
+        dp = dict((k,v) for k, v in [(s, 0) for s in self.symbol_list])
+        try:
+            dp['datetime'] = bars[self.symbol_list[0]][0][1]
+        except:
+            pass
 
         for s in self.symbol_list:
             dp[s] = self.current_positions[s]

@@ -7,7 +7,6 @@ from abc import ABCMeta, abstractmethod
 import pandas as pd
 
 from event import MarketEvent
-from q import Que
 
 class DataHandler:
     # __metaclass__ property to let Python know that this is an ABC (Abstract Base Class)
@@ -50,7 +49,7 @@ class HistoricalCSV_DataHander(DataHandler):
             self.symbol_data[s] = pd.read_csv(
                 os.path.join(self.csv_dir, '{}.csv'.format(s)),
                 header = 0, index_col = 0,
-                names = ['datetime','open','low','high','close','volume','oi']
+                names = ['date','open','high','low','close','adjclose','volume']
             )
 
             # combine the index to 'pad' forward values
@@ -66,13 +65,13 @@ class HistoricalCSV_DataHander(DataHandler):
         for s in self.symbol_list:
             self.symbol_data[s] = self.symbol_data[s].reindex(index=comb_index, method = 'pad').iterrows()
 
-
     def _get_new_bar(self, symbol):
         # returns tuple of the latest data from the 'data feed'
         # (symbol, datetime, open, low, high, close, volume)
         for b in self.symbol_data[symbol]:
-            yield tuple([symbol, datetime.strptime(b[0], "%Y-%m-%d"),
+            yield tuple([symbol, (b[0]),
                          b[1][0], b[1][1], b[1][2], b[1][3], b[1][4]])
+            #(b[0], "%Y-%m-%d")
 
     def get_latest_bars(self,symbol, N=1):
         # try: return last N data/bars from the most recent symbol_list
@@ -94,4 +93,5 @@ class HistoricalCSV_DataHander(DataHandler):
             else:
                 if bar is None:
                     self.latest_symbol_data[s].append(bar)
-        self.events.qput(MarketEvent)
+        market = MarketEvent()
+        self.events.qput(market)
