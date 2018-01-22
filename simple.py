@@ -6,14 +6,16 @@ import math
 
 portfolio = {'cash':1000000.0,'wilshire':{'shares': 0,'VWAP': 0.0}}
 
-file = 'files/WILL5000INDFC.csv'                        # File Location
-data = pd.read_csv(file, names=['date','price'])        # Create DataFrame
-data = data[data.price > '0.20']                        # Get rid of rows with prices == 0 (holidays)
-data['MA5'] = data['price'].rolling(5).mean()           # 5 day moving average
-data['MA10'] = data['price'].rolling(10).mean()         # 10 day moving average
-data['ratio'] = data['MA5']/data['MA10']                # 5MA / 10MA Ratio
-data = data.dropna()                                    # Drop Non-Real Numbers
-num_of_rows = (data.shape)[0]                           # Number of rows (to iterate over later)
+strats = {'5.10': [0, 5, 10], '5.20': [0, 5, 20], '5.30': [0,5,30]}
+
+file = 'files/WILL5000INDFC.csv'                         # File Location
+data = pd.read_csv(file, names=['date','price'])         # Create DataFrame
+data = data[data.price > '0.20']                         # Get rid of rows with prices == 0 (holidays)
+data['MA-A'] = data['price'].rolling(5).mean()           # 5 day moving average
+data['MA-B'] = data['price'].rolling(10).mean()          # 10 day moving average
+data['ratio'] = data['MA-A']/data['MA-B']                # 5MA / 10MA Ratio
+data = data.dropna()                                     # Drop Non-Real Numbers
+num_of_rows = (data.shape)[0]                            # Number of rows (to iterate over later)
 
 dbuy = data[data.ratio > 1.01]
 dsell = data[data.ratio < 0.99]
