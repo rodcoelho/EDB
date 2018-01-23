@@ -43,7 +43,6 @@ for key, value in strats.items():
     dbuy = data[data.ratio > 1.01]                                      # if ratio > 1, it's a buy signal
     dsell = data[data.ratio < 0.99]                                     # if ratio < 1, it's a sell signal
 
-
     last_transaction = 'SELL'                                           # keeps track of last transaction
     for i, (index, row) in enumerate(data.iterrows()):
         # BUY signal
@@ -76,5 +75,9 @@ for key, value in strats.items():
             portfolio['wilshire']['shares'] = 0
             strats[key][0] = (portfolio['cash'] - 1000000.0) / 1000000.0
 
+strategy_returns_sort = []
 for keys, values in strats.items():
-    print("Returns from {} strategy: % {:.2f}".format(keys, values[0]*100))
+    strategy_returns_sort.append((keys, values[0] * 100))
+strategy_returns_sort.sort(key=lambda tup: tup[1], reverse=True)
+for tup in strategy_returns_sort:
+    print("Returns from {} strategy: {:.2f}% ".format(tup[0], tup[1]))
